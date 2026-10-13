@@ -20,18 +20,22 @@ Four teammates:
   "always hiring" language, scraped/duplicate postings) and your actual fit
 - **tailor** — drafts tailored resume bullets, a cover letter, and application-question
   answers, pulling only from facts you've actually written down
-- **form-filler** (optional, needs Claude in Chrome) — opens the real application and fills
-  it in, stopping before the Submit button
+- **form-filler** (optional, needs browser-control tooling) — opens the real application and
+  fills it in, stopping before the Submit button
 
 They hand off to each other as they go, not in a rigid batch, so validator starts checking
 a listing the moment finder reports it instead of waiting for the full list.
 
+Works in **Claude Code** (as four spawned teammates, see below) or **Codex** (as one session
+running the same four roles in sequence, see [Using this with Codex](#using-this-with-codex-instead-of-claude-code)).
+
 ## Prerequisites
 
-- Claude Code Desktop, signed in with your CPVC seat
-- Pro plan or higher (agent teams needs it, covered by your seat)
+- Claude Code Desktop, signed in with your CPVC seat, **or** Codex CLI
+- Pro plan or higher if using Claude Code (agent teams needs it, covered by your seat)
 - Git
-- For the form-filler step only: the Claude in Chrome browser extension, connected
+- For the form-filler step only: browser-control tooling connected (Claude in Chrome for
+  Claude Code; whatever your Codex setup uses, if anything)
 
 ## Step 1 — Get this repo
 
@@ -103,20 +107,24 @@ submit.
 
 ## Using this with Codex instead of Claude Code
 
-Codex doesn't have Claude Code's agent-teams spawning, so you run the same four roles
-sequentially in one session instead of as parallel teammates:
+Codex doesn't have Claude Code's agent-teams spawning, but it does read `AGENTS.md`
+automatically when you open this folder, the same way Claude Code reads `CLAUDE.md`. That
+file tells Codex to run the same four roles itself, in sequence, in one session, instead of
+spawning teammates.
 
-1. Open `.claude/agents/finder.md`, paste its instructions (everything after the `---`) into
-   Codex along with "read PROFILE.md first." It writes `runs/found.md`.
-2. Open `.claude/agents/validator.md`, paste its instructions in a fresh message, tell it to
-   read `runs/found.md`. It writes `runs/validated.md`.
-3. Same for `tailor.md`, reading `runs/validated.md`.
-4. Same for `form-filler.md` when you're ready, if Codex has browser control available to
-   it, if not, skip straight to reviewing `runs/packets/` by hand.
+1. `cp PROFILE_TEMPLATE.md PROFILE.md` and fill it in, same as the Claude Code path.
+2. Open this folder in Codex. If it doesn't act on `AGENTS.md` automatically, paste
+   `prompts/codex-kickoff-prompt.md` as-is.
+3. Codex works through finder → validator → tailor itself, writing the same `runs/found.md`
+   → `runs/validated.md` → `runs/packets/` files the Claude Code version produces.
+4. When you're ready to pre-fill a real application, tell it to run the form-filler step
+   named in `AGENTS.md` on a specific packet, if browser-control tooling is available in
+   your Codex setup. If it's not, Codex will say so and stop rather than fake it.
 
-It's the exact same files and the exact same rules, just invoked one at a time instead of
-run as a team. That's worth pointing out live: the orchestration pattern (files as the
-handoff, not a framework) is what made this portable across tools in the first place.
+Same files, same rules, same output shape either way, that's the part worth pointing out
+live: the orchestration pattern (markdown role files plus files-on-disk handoffs, not a
+framework) is what made this portable across tools in the first place. `AGENTS.md` and
+`CLAUDE.md`/`.claude/agents/` are just two different front doors into the same rooms.
 
 ## Troubleshooting
 
