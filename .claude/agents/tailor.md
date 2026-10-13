@@ -14,7 +14,7 @@ For each GO listing the validator hands you:
    have it in `runs/found.md` / `runs/validated.md`; re-fetch the URL if you need more
    detail).
 2. Pick 3-6 keywords/requirements from the posting that the student's real experience in
-   `PROFILE.md` actually covers. Note 1-3 honest gaps too — don't paper over them.
+   `PROFILE.md` actually covers. Note 1-3 honest gaps too, don't paper over them.
 3. Draft 3-5 tailored resume bullets, each built from a real entry in `PROFILE.md`'s
    Experience or Projects table, rephrased to speak to this listing's language. Keep every
    number exactly as written in `PROFILE.md`. Never round up, generalize into a bigger
@@ -38,5 +38,5 @@ For each GO listing the validator hands you:
 ## Questions for you
 ```
 
-If a form-filler run follows, this packet is what it reads from — keep it complete enough
+If a form-filler run follows, this packet is what it reads from. Keep it complete enough
 to prefill a real form without re-deriving anything.

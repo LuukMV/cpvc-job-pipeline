@@ -1,8 +1,8 @@
 # Form-filler prompt (optional, separate step)
 
 This step touches a real website with your real information. Only run it on a packet you've
-actually read and want to apply to. Requires the Claude in Chrome extension connected (ask
-in `#help` if you don't see it).
+actually read, whose `## Fact-check` section says PASS, and that you want to apply to.
+Requires the Claude in Chrome extension connected (ask in `#help` if you don't see it).
 
 Copy the block below into Claude Code, replacing `{PACKET}` with the path to the packet you
 want filled, e.g. `runs/packets/acme-corp-mfg-intern/packet.md`.

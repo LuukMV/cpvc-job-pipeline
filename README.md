@@ -1,10 +1,11 @@
 # CPVC Job Pipeline
 
 A real, working job-application pipeline built for the Cal Poly Vibe Coding Club. By the
-end of this walkthrough you'll have four AI teammates finding real job listings, checking
-them for ghost-listing red flags, tailoring your resume and cover letter to each one, and
-(optionally) pre-filling the actual application form in your browser, stopping right before
-you'd click submit.
+end of this walkthrough you'll have AI teammates turning your resume or LinkedIn into a
+profile, finding real job listings, checking them for ghost-listing red flags, tailoring
+your resume and cover letter to each one, strictly fact-checking every claim before it
+reaches you, and (optionally) pre-filling the actual application form in your browser,
+stopping right before you'd click submit.
 
 This isn't a toy. Point it at your own job search and it goes to work on real postings with
 your real information. Treat every output like a first draft from a fast, tireless intern:
@@ -12,22 +13,27 @@ useful, but yours to review before anything goes out.
 
 ## What you'll end up with
 
-Four teammates:
+Six teammates:
 
-- **finder** — searches real job boards and company career pages for roles matching your
+- **intake**: builds a first-draft profile from a pasted resume or LinkedIn, so you get
+  real results in minutes instead of filling out a form first
+- **finder**: searches real job boards and company career pages for roles matching your
   profile
-- **validator** — re-checks each listing for ghost-listing signals (dead links, evergreen
+- **validator**: re-checks each listing for ghost-listing signals (dead links, evergreen
   "always hiring" language, scraped/duplicate postings) and your actual fit
-- **tailor** — drafts tailored resume bullets, a cover letter, and application-question
+- **tailor**: drafts tailored resume bullets, a cover letter, and application-question
   answers, pulling only from facts you've actually written down
-- **form-filler** (optional, needs browser-control tooling) — opens the real application and
+- **fact-checker**: a strict, zero-tolerance pass on every packet. Every claim either
+  traces exactly to your profile or the packet is marked FAILED, not "close enough"
+- **form-filler** (optional, needs browser-control tooling): opens the real application and
   fills it in, stopping before the Submit button
 
 They hand off to each other as they go, not in a rigid batch, so validator starts checking
-a listing the moment finder reports it instead of waiting for the full list.
+a listing the moment finder reports it, and fact-checker starts the moment tailor finishes
+one packet rather than waiting for the whole batch.
 
-Works in **Claude Code** (as four spawned teammates, see below) or **Codex** (as one session
-running the same four roles in sequence, see [Using this with Codex](#using-this-with-codex-instead-of-claude-code)).
+Works in **Claude Code** (as spawned teammates, see below) or **Codex** (as one session
+running the same roles in sequence, see [Using this with Codex](#using-this-with-codex-instead-of-claude-code)).
 
 ## Prerequisites
 
@@ -37,91 +43,108 @@ running the same four roles in sequence, see [Using this with Codex](#using-this
 - For the form-filler step only: browser-control tooling connected (Claude in Chrome for
   Claude Code; whatever your Codex setup uses, if anything)
 
-## Step 1 — Get this repo
+## Step 1: get this repo
 
 ```bash
 git clone <this-repo-url>
 cd cpvc-job-pipeline
 ```
 
-## Step 2 — Fill in your real profile
+## Step 2: get a profile in place (two ways)
 
+**Fast path, see results in minutes.** Don't fill anything in by hand. When you paste the
+kickoff prompt in Step 4, paste your resume text and/or your LinkedIn "About"/experience
+section right above it. The `intake` teammate builds a first-draft `PROFILE.md` from it
+automatically, everything it's not sure about gets flagged rather than guessed.
+
+**Thorough path, more accurate, slower to start.**
 ```bash
 cp PROFILE_TEMPLATE.md PROFILE.md
 ```
-
 Open `PROFILE.md` and fill in your real info: contact details, what you're looking for,
-education, and real experience with real numbers. `PROFILE.md` is gitignored, it never gets
-committed. Every agent in this pipeline reads this file and only this file for facts about
-you, that's what keeps it from making things up.
+education, and real experience with real numbers.
+
+Either way, `PROFILE.md` is gitignored, it never gets committed, and every agent in this
+pipeline reads this file and only this file for facts about you. Doing the fast path first
+and refining `PROFILE.md` by hand afterward is the intended flow, not a compromise. Rerun
+the pipeline once you've sharpened it and watch the packets get better.
 
 Also skim `RULES.md`. It's short, and it's the whole reason this is safe to point at a real
-job search: never fabricate a fact, never submit anything for you, never check a consent
-box on your behalf.
+job search: never fabricate a fact, verify every claim before it's considered done, never
+submit anything for you, never check a consent box on your behalf.
 
-## Step 3 — Open it in Claude Code Desktop
+## Step 3: open it in Claude Code Desktop
 
 Open the folder as your project. Claude Code reads `.claude/settings.json` (agent teams is
-already turned on) and `.claude/agents/` (the four teammate definitions) automatically.
+already turned on) and `.claude/agents/` (the teammate definitions) automatically.
 
-Worth actually reading `.claude/agents/validator.md` before you run anything. It's a plain
-markdown file with a little YAML on top, that's the entire mechanism.
+Worth actually reading `.claude/agents/fact-checker.md` before you run anything. It's a
+plain markdown file with a little YAML on top, that's the entire mechanism.
 
-## Step 4 — Run the kickoff prompt
+## Step 4: run the kickoff prompt
 
-Open `prompts/kickoff-prompt.md`, copy the prompt block, paste it into Claude Code as-is.
+Open `prompts/kickoff-prompt.md`, copy the prompt block, paste it into Claude Code (with
+your resume/LinkedIn text above it if you're on the fast path).
 
-Watch the agent panel populate as finder, validator, and tailor spawn. Arrow keys to select
-a teammate, Enter to watch its transcript live.
+Watch the agent panel populate as teammates spawn. Arrow keys to select one, Enter to watch
+its transcript live.
 
-## Step 5 — Read your packets
+## Step 5: read your packets
 
 Once it's done, open `runs/validated.md` to see every listing's verdict and why (SKIP always
 comes with a real reason, never a silent drop), then open whatever landed in
-`runs/packets/`. Each packet has resume bullets, a cover letter, and question answers ready
-to review.
+`runs/packets/`. Each packet has resume bullets, a cover letter, question answers, and a
+`## Fact-check` section at the bottom, scroll straight to that first. PASS means every claim
+traced to your profile. FAILED means exactly what it sounds like, don't use that packet as-is.
 
-## Step 6 — (Optional) Pre-fill a real application
+## Step 6 (optional): pre-fill a real application
 
-Only do this for a packet you've actually read and want to apply to. See
-`prompts/form-filler-prompt.md` for the exact steps. The form-filler opens a brand-new
-browser tab for each application, fills what it can, and stops before Submit. You click
-submit.
+Only do this for a packet whose fact-check says PASS and that you've actually read and want
+to apply to. See `prompts/form-filler-prompt.md` for the exact steps. The form-filler opens
+a brand-new browser tab for each application, fills what it can, and stops before Submit.
+You click submit.
 
 ## What's actually happening here
 
 - **Connectors**: web search/fetch for finder and validator, browser control for the
   optional form-filler step.
-- **Reusable roles (skills-style)**: the four agent definitions in `.claude/agents/` are
-  plain markdown, you could drop them into any other project and reference them the same
-  way.
-- **Agent teams**: four independent Claude sessions with their own context windows,
-  coordinating through messages and files on disk (`runs/found.md` →
-  `runs/validated.md` → `runs/packets/`) instead of you manually copy-pasting between them.
-  That file-handoff pattern is the actual lesson here: orchestration doesn't need a special
-  framework, just files with a clear contract between steps.
+- **Reusable roles (skills-style)**: the agent definitions in `.claude/agents/` are plain
+  markdown, you could drop them into any other project and reference them the same way.
+- **Agent teams**: independent Claude sessions with their own context windows, coordinating
+  through messages and files on disk (`runs/found.md` then `runs/validated.md` then
+  `runs/packets/`) instead of you manually copy-pasting between them. That file-handoff
+  pattern is the actual lesson here: orchestration doesn't need a special framework, just
+  files with a clear contract between steps.
 - **The safety rail is the point**: `RULES.md` is what makes this usable on a real job
-  search instead of a demo you'd never trust. Notice that the tailor agent would rather
-  write `[CONFIRM: ...]` than invent a number, and the form-filler would rather stop and
-  tell you something looks wrong than guess.
+  search instead of a demo you'd never trust. Notice the tailor agent would rather write
+  `[CONFIRM: ...]` than invent a number, the fact-checker would rather fail a packet than
+  wave through a plausible-sounding claim, and the form-filler would rather stop and tell
+  you something looks wrong than guess.
+- **Fast start without cutting corners**: `intake` is the one place in this pipeline allowed
+  to infer anything (a likely target role/location from your resume), and even then it's
+  only a search filter, clearly flagged, never something that ends up in a sentence sent to
+  an employer. Everything downstream of that is held to the strict standard.
 
 ## Using this with Codex instead of Claude Code
 
 Codex doesn't have Claude Code's agent-teams spawning, but it does read `AGENTS.md`
 automatically when you open this folder, the same way Claude Code reads `CLAUDE.md`. That
-file tells Codex to run the same four roles itself, in sequence, in one session, instead of
+file tells Codex to run the same roles itself, in sequence, in one session, instead of
 spawning teammates.
 
-1. `cp PROFILE_TEMPLATE.md PROFILE.md` and fill it in, same as the Claude Code path.
+1. Fast path: paste your resume/LinkedIn text above the kickoff prompt. Thorough path:
+   `cp PROFILE_TEMPLATE.md PROFILE.md` and fill it in yourself first. Same as Claude Code.
 2. Open this folder in Codex. If it doesn't act on `AGENTS.md` automatically, paste
    `prompts/codex-kickoff-prompt.md` as-is.
-3. Codex works through finder → validator → tailor itself, writing the same `runs/found.md`
-   → `runs/validated.md` → `runs/packets/` files the Claude Code version produces.
+3. Codex works through intake (if needed), then finder, validator, tailor, fact-checker
+   itself, writing the same `runs/found.md`, `runs/validated.md`, `runs/packets/` files the
+   Claude Code version produces, each packet ending with a PASS/FAILED `## Fact-check`.
 4. When you're ready to pre-fill a real application, tell it to run the form-filler step
-   named in `AGENTS.md` on a specific packet, if browser-control tooling is available in
-   your Codex setup. If it's not, Codex will say so and stop rather than fake it.
+   named in `AGENTS.md` on a specific packet whose fact-check passed, if browser-control
+   tooling is available in your Codex setup. If it's not, Codex will say so and stop rather
+   than fake it.
 
-Same files, same rules, same output shape either way, that's the part worth pointing out
+Same files, same rules, same output shape either way. That's the part worth pointing out
 live: the orchestration pattern (markdown role files plus files-on-disk handoffs, not a
 framework) is what made this portable across tools in the first place. `AGENTS.md` and
 `CLAUDE.md`/`.claude/agents/` are just two different front doors into the same rooms.
@@ -140,10 +163,13 @@ framework) is what made this portable across tools in the first place. `AGENTS.m
 - **A filled-out form disappeared**: almost always a tab got reused instead of opened fresh.
   `RULES.md` and `form-filler.md` both call this out, it's a real failure mode, not a
   hypothetical.
+- **A packet keeps coming back FAILED**: that usually means `PROFILE.md` is too thin (common
+  right after the fast path) for the tailor to write specific-enough bullets without
+  reaching. Fill in more of the Experience/Projects tables and rerun.
 
 ## Going further
 
-- Add a fifth teammate: an outreach agent that finds a real hiring-manager contact and
+- Add a seventh teammate: an outreach agent that finds a real hiring-manager contact and
   drafts a connection note (draft only, you send it).
 - Rerun `finder` with a different target role in `PROFILE.md` to see it build a fresh batch.
 - Package this as a plugin so the rest of the club can install it in one step instead of

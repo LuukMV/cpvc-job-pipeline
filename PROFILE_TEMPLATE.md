@@ -23,7 +23,7 @@ never gets committed or shared).
 |---|---|
 | Target role(s) / title keywords | e.g. "Industrial Engineering Intern", "Supply Chain Analyst", "Marketing Intern" |
 | Target majors / fields this applies to | |
-| Locations (be specific — city/metro, or "remote OK") | |
+| Locations (be specific: city/metro, or "remote OK") | |
 | Term | e.g. "Summer 2027" |
 | Earliest start / latest end | |
 | Work authorization | e.g. "U.S. citizen, no sponsorship needed" |
